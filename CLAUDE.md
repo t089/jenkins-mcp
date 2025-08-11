@@ -41,6 +41,23 @@ The SDK uses nested, path-scoped resources:
 - Check imports and dependencies before adding libraries
 - Use `.swift-format` rules for consistent formatting
 
+### Platform support
+
+Supported platform are Linux and macOS. Always make sure that code works on both.
+
+When using `Foundation`, make sure to only use `FoundationEssentials` on linux!
+
+```swift
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
+import Foundation
+#endif
+```
+
+Things that are available on `FoundationEssentials`: `URL`, `Data`, `FileManager`, `Decimal`, `JSONEncoder/JSONDecoder`, `Date`, `DateComponents`, `HTTPFormatStyle`, `ISO8601FormatStyle`, `ProcessInfo`.
+Some of the other `Foundation` APIs are only available in the "full" Foundation unfortunately. Avoid extension provided by `Foundation` such as `String.data(using:)`, prefer `Array(string.utf8)` or `Data(stringutf8)` and `String(decoding:as:)`.
+
 ### MCP Tool Architecture
 Each Jenkins operation in `Sources/JenkinsMCP/Tools/`:
 - Implements `JenkinsTool` protocol

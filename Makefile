@@ -1,5 +1,5 @@
-HOST=
-REPOSITORY=$(HOST)/jenkins-mcp
+HOST=ghcr.io
+REPOSITORY=$(HOST)/t089/jenkins-mcp
 TAG=0.0.1
 
 

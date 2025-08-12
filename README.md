@@ -74,12 +74,13 @@ targets: [
 - `get_overview` - Jenkins server overview
 - `list_jobs` - List jobs in a folder
 - `get_job` / `get_job_by_url` - Get job details
-- `start_build` - Trigger builds with parameters
-- `stop_build` - Stop running builds
+- `trigger_build` - Trigger builds with parameters
 
 **Build Operations:**
 - `get_build` / `get_build_by_url` - Get build details
+- `stop_build` - Stop running builds
 - `get_queue` - View build queue
+- `get_queue_item` - Get specific queue item details
 - `cancel_queue_item` - Cancel queued builds
 
 **Log Analysis:**

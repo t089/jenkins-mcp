@@ -64,7 +64,7 @@ let package = Package(
             dependencies: [
                 "JenkinsSDK",
                 "HTTPTransport",
-
+                "Netrc"
             ]
         ),
         .executableTarget(

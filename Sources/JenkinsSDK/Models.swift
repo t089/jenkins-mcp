@@ -100,25 +100,26 @@ public struct Job: Codable, Sendable {
 }
 
 public struct BuildReference: Codable, Sendable {
-    public let number: Int
-    public let url: String
+    public var number: Int
+    public var url: String
 }
 
 public struct JenkinsOverview: Codable, Sendable {
-    public let jobs: [JobSummary]
-    public let description: String?
-    public let nodeName: String?
-    public let nodeDescription: String?
-    public let numExecutors: Int?
-    public let mode: String?
+    public var version: String?
+    public var jobs: [JobSummary]
+    public var description: String?
+    public var nodeName: String?
+    public var nodeDescription: String?
+    public var numExecutors: Int?
+    public var mode: String?
 }
 
 public struct JobSummary: Codable, Sendable {
-    public let name: String
-    public let url: String
-    public let color: String?
-    public let buildable: Bool?
-    public let description: String?
+    public var name: String
+    public var url: String
+    public var color: String?
+    public var buildable: Bool?
+    public var description: String?
     
     // Helper properties
     public var isHealthy: Bool {

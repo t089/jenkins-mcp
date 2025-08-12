@@ -43,12 +43,7 @@ public struct AsyncLineSequence: AsyncSequence, Sendable {
                 return nil
             }
 
-            // First check if we already have a complete line in the buffer
-            if let line = readLine(buffer: &buffer) {
-                return line
-            }
 
-            // If no complete line in buffer, read from upstream until we have one or it's depleted
             while let chunk = try await bodyIterator.next() {
                 buffer.writeBytes(chunk)
 
@@ -57,13 +52,20 @@ public struct AsyncLineSequence: AsyncSequence, Sendable {
                 }
             }
             
-            // Stream is exhausted, return any remaining data as final line
-            guard buffer.readableBytes > 0 else {
-                return nil
-            }
+            
+            if let line = readLine(buffer: &buffer) {
+                return line
+            } else {
+                guard buffer.readableBytes > 0 else {
+                    return nil
+                }
 
-            defer { buffer.clear() }
-            return String(decoding: buffer.readableBytesView, as: UTF8.self)
+                defer { buffer.clear() }
+                return String(decoding: buffer.readableBytesView, as: UTF8.self)
+            }
+            
+
+            
         }
     }
 }

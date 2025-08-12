@@ -42,13 +42,13 @@ public struct JenkinsClient: Sendable {
         public func get() async throws -> Job {
             let jobPath = path.split(separator: "/").map { "job/\($0)" }.joined(separator: "/")
             let request = try self.client.buildRequest(path: "/\(jobPath)/api/json")
-            let job: Job = try await self.client.performJSONRequest(request)
+            let (_, job): (HTTPResponse, Job) = try await self.client.performJSONRequest(request)
             return job
         }
 
         public func get(byURL url: String) async throws -> Job {
             let apiURL = self.client.makeAPIURL(from: url, tree: nil)
-            let job: Job = try await self.client.performJSONRequestForURL(apiURL)
+            let (_, job): (HTTPResponse, Job) = try await self.client.performJSONRequestForURL(apiURL)
             return job
         }
 
@@ -66,40 +66,69 @@ public struct JenkinsClient: Sendable {
             }
 
             public func trigger(parameters: [String: String] = [:]) async throws -> QueueItemRef {
-                let jobPathComponents = jobPath.split(separator: "/").map { "job/\($0)" }.joined(separator: "/")
-                var request = try self.client.buildRequest(path: "/\(jobPathComponents)/buildWithParameters", method: .post)
+                func trigger(candidate: String) async throws -> QueueItemRef {
+                    let jobPathComponents = jobPath.split(separator: "/").map { "job/\($0)" }.joined(separator: "/")
+                    var request = try self.client.buildRequest(
+                        path: "/\(jobPathComponents)/\(candidate)",
+                        method: .post
+                    )
 
-                let formBody: HTTPBody?
-                if !parameters.isEmpty {
-                    request.headerFields[.contentType] = "application/x-www-form-urlencoded"
-                    let parameterString = parameters.formUrlEncoded()
-                    formBody = .init(bytes: parameterString.utf8)
+                    let formBody: HTTPBody?
+                    if !parameters.isEmpty {
+                        request.headerFields[.contentType] = "application/x-www-form-urlencoded"
+                        let parameterString = parameters.formUrlEncoded()
+                        formBody = .init(bytes: parameterString.utf8)
+                    } else {
+                        formBody = nil
+                    }
+                    let (response, _) = try await self.client.transport.send(request, body: formBody, baseUrl: self.client.baseURL)
+
+                    guard response.status == .created else {
+                        throw JenkinsAPIError.httpError(response.status.code)
+                    }
+
+                    guard let location = response.headerFields[.location] else {
+                        throw JenkinsAPIError.noData
+                    }
+
+                    return QueueItemRef(url: location)
+                }
+
+                let candidates: [String]
+                if parameters.isEmpty {
+                    candidates = ["build", "buildWithParameters"]
                 } else {
-                    formBody = nil
-                }
-                let (response, _) = try await self.client.transport.send(request, body: formBody, baseUrl: self.client.baseURL)
-
-                guard response.status == .created else {
-                    throw JenkinsAPIError.httpError(response.status.code)
+                    candidates = ["buildWithParameters", "build"]
                 }
 
-                guard let location = response.headerFields[.location] else {
-                    throw JenkinsAPIError.noData
+                var error: JenkinsAPIError? = nil
+                for candidate in candidates {
+                    do {
+                        return try await trigger(candidate: candidate)
+                    } catch JenkinsAPIError.httpError(let code) where code / 100 == 4 {
+                        // Method not allowed, try next candidate
+                        error = JenkinsAPIError.httpError(code)
+                        continue
+                    }
                 }
 
-                return QueueItemRef(url: location)
+                if let error = error {
+                    throw error
+                } else {
+                    fatalError("Unreachable: must have thrown an error here")
+                }
             }
 
             public func get(number buildNumber: Int) async throws -> Build {
                 let jobPath = jobPath.split(separator: "/").map { "job/\($0)" }.joined(separator: "/")
                 let request = try self.client.buildRequest(path: "/\(jobPath)/\(buildNumber)/api/json")
-                let build: Build = try await self.client.performJSONRequest(request)
+                let (_, build): (HTTPResponse, Build) = try await self.client.performJSONRequest(request)
                 return build
             }
 
             public func get(byURL url: String) async throws -> Build {
                 let apiURL = self.client.makeAPIURL(from: url)
-                let build: Build = try await self.client.performJSONRequestForURL(apiURL)
+                let (_, build): (HTTPResponse, Build) = try await self.client.performJSONRequestForURL(apiURL)
                 return build
             }
 
@@ -116,7 +145,7 @@ public struct JenkinsClient: Sendable {
             public func logs(number buildNumber: Int) async throws -> String {
                 let jobPath = jobPath.split(separator: "/").map { "job/\($0)" }.joined(separator: "/")
                 let request = try self.client.buildRequest(path: "/\(jobPath)/\(buildNumber)/consoleText")
-                let data = try await self.client.performRawRequest(request)
+                let (_, data) = try await self.client.performRawRequest(request)
                 return String(decoding: data, as: UTF8.self)
             }
 
@@ -228,12 +257,14 @@ public struct JenkinsClient: Sendable {
 
         public func info() async throws -> QueueInfo {
             let request = try self.client.buildRequest(path: "/queue/api/json")
-            return try await self.client.performJSONRequest(request)
+            let (_, info): (HTTPResponse, QueueInfo) = try await self.client.performJSONRequest(request)
+            return info
         }
 
         public func item(forId id: Int) async throws -> QueueItem {
             let request = try self.client.buildRequest(path: "/queue/item/\(id)/api/json")
-            return try await self.client.performJSONRequest(request)
+            let (_, item): (HTTPResponse, QueueItem) = try await self.client.performJSONRequest(request)
+            return item
         }
 
         public func item(referencedBy ref: QueueItemRef) async throws -> QueueItem {
@@ -242,7 +273,8 @@ public struct JenkinsClient: Sendable {
 
         public func item(byURL url: String) async throws -> QueueItem {
             let apiURL = self.client.makeAPIURL(from: url)
-            return try await self.client.performJSONRequestForURL(apiURL)
+            let (_, item): (HTTPResponse, QueueItem) = try await self.client.performJSONRequestForURL(apiURL)
+            return item
         }
 
         public func cancel(id: Int) async throws {
@@ -261,7 +293,21 @@ public struct JenkinsClient: Sendable {
     
     public func get() async throws -> JenkinsOverview {
         let request = try buildRequest(path: "/api/json")
-        return try await performJSONRequest(request)
+        let (response, overview): (HTTPResponse, JenkinsOverview) = try await performJSONRequest(request)
+        
+        // Extract version from X-Jenkins header
+        let version = response.headerFields[.init("X-Jenkins")!]
+        
+        // Create a new JenkinsOverview with the version field populated
+        return JenkinsOverview(
+            version: version,
+            jobs: overview.jobs,
+            description: overview.description,
+            nodeName: overview.nodeName,
+            nodeDescription: overview.nodeDescription,
+            numExecutors: overview.numExecutors,
+            mode: overview.mode
+        )
     }
 
     internal func buildRequest(path: String, method: HTTPRequest.Method = .get) throws -> HTTPRequest {
@@ -322,16 +368,17 @@ public struct JenkinsClient: Sendable {
 }
 
 extension JenkinsClient {
-    internal func performJSONRequest<T: Decodable>(_ request: HTTPRequest) async throws -> T {
-        let data = try await performRawRequest(request)
+
+    internal func performJSONRequest<T: Decodable>(_ request: HTTPRequest) async throws -> (HTTPResponse, T) {
+        let (response, data) = try await performRawRequest(request)
         do {
-            return try decoder.decode(T.self, from: Data(data))
+            return (response, try decoder.decode(T.self, from: Data(data)))
         } catch {
             throw JenkinsAPIError.decodingError(error)
         }
     }
 
-    internal func performRawRequest(_ request: HTTPRequest) async throws -> ArraySlice<UInt8> {
+    internal func performRawRequest(_ request: HTTPRequest) async throws -> (HTTPResponse, ArraySlice<UInt8>) {
         let (response, body) = try await transport.send(request, body: nil, baseUrl: baseURL)
 
         guard response.status.code == 200 else {
@@ -342,7 +389,7 @@ extension JenkinsClient {
             throw JenkinsAPIError.noData
         }
 
-        return try await body.collect(upTo: 100_000_000)
+        return (response, try await body.collect(upTo: 100_000_000))
     }
 
     internal func performProgressiveRequest(_ request: HTTPRequest) async throws -> (
@@ -364,7 +411,7 @@ extension JenkinsClient {
         return (body, hasMoreData, textSize)
     }
 
-    internal func performJSONRequestForURL<T: Decodable>(_ urlString: String) async throws -> T {
+    internal func performJSONRequestForURL<T: Decodable>(_ urlString: String) async throws -> (HTTPResponse, T) {
         guard let url = URL(string: urlString) else {
             throw JenkinsAPIError.invalidURL
         }
@@ -395,7 +442,7 @@ extension JenkinsClient {
 
         let data = try await body.collect(upTo: 100_000_000)
         do {
-            return try decoder.decode(T.self, from: Data(data))
+            return (response, try decoder.decode(T.self, from: Data(data)))
         } catch {
             throw JenkinsAPIError.decodingError(error)
         }
@@ -406,6 +453,15 @@ extension JenkinsClient {
 
 public struct QueueItemRef: Codable, Sendable {
     public var url: String
+    public var queueItemId: Int?
+
+
+    public init(url: String) {
+        self.url = url
+        let queryStart = url.firstIndex(of: "?") ?? url.endIndex
+        let id = url[..<queryStart].split(separator: "/").last.flatMap({ Int($0) })
+        self.queueItemId = id
+    }
 }
 
 public struct GrepMatch: Codable, Sendable {

@@ -145,3 +145,7 @@ swift build -c release
 # Build Docker images
 make docker
 ```
+
+~~~
+
+Copyright 2025 Tobias Haeberle

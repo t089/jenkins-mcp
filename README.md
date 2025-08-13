@@ -146,6 +146,6 @@ swift build -c release
 make docker
 ```
 
-~~~
 
+---
 Copyright 2025 Tobias Haeberle

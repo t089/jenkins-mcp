@@ -24,10 +24,10 @@ struct TriggerBuildTool: JenkinsTool {
                     "type": "boolean",
                     "default": false,
                     "description": """
-                        If true, the tool will wait for the build to start and return the queue item \
-                        reference. If false, it will return immediately with the queue item reference. \
-                        The tool will wait for up to 30 seconds for the build to start before returning.
-                        """
+                    If true, the tool will wait for the build to start and return the queue item \
+                    reference. If false, it will return immediately with the queue item reference. \
+                    The tool will wait for up to 30 seconds for the build to start before returning.
+                    """,
                 ]),
             ],
             "required": ["path"],
@@ -56,7 +56,7 @@ struct TriggerBuildTool: JenkinsTool {
 
         let ref = try await jenkinsClient.job(at: path).builds.trigger(parameters: parameters)
         var item = try await jenkinsClient.queue.item(referencedBy: ref)
-        
+
         let waitForStart = arguments["waitForBuildToStart"]?.boolValue ?? false
 
         if !waitForStart {
@@ -65,7 +65,7 @@ struct TriggerBuildTool: JenkinsTool {
 
         let deadline = ContinuousClock.now + .seconds(30)
 
-        while item.executable?.number == nil && .now < deadline{
+        while item.executable?.number == nil && .now < deadline {
             try await Task.sleep(for: .seconds(1))
             item = try await jenkinsClient.queue.item(forId: item.id)
         }

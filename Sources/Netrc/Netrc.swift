@@ -11,12 +11,12 @@ private enum Tok<Input: Collection> where Input.Element == UInt8 {
 // MARK: - Byte helpers
 
 @inline(__always) private func isSpaceOrTab(_ b: UInt8) -> Bool {
-    b == 0x20 || b == 0x09 // ' ' or '\t'
+    b == 0x20 || b == 0x09  // ' ' or '\t'
 }
 
-@inline(__always) private func isLF(_ b: UInt8) -> Bool { b == 0x0A } // \n
-@inline(__always) private func isCR(_ b: UInt8) -> Bool { b == 0x0D } // \r
-@inline(__always) private func isHash(_ b: UInt8) -> Bool { b == 0x23 } // '#'
+@inline(__always) private func isLF(_ b: UInt8) -> Bool { b == 0x0A }  // \n
+@inline(__always) private func isCR(_ b: UInt8) -> Bool { b == 0x0D }  // \r
+@inline(__always) private func isHash(_ b: UInt8) -> Bool { b == 0x23 }  // '#'
 
 // MARK: - Generic Lexer over bytes
 
@@ -71,7 +71,7 @@ private struct Lexer<Input: Collection> where Input.Element == UInt8 {
                 repeat {
                     input.formIndex(after: &i)
                 } while i != input.endIndex && !(isLF(input[i]) || isCR(input[i]))
-                return // next() will see newline and emit it
+                return  // next() will see newline and emit it
             }
 
             // space / tab => skip and continue
@@ -89,7 +89,8 @@ private struct Lexer<Input: Collection> where Input.Element == UInt8 {
         guard i != input.endIndex else { return false }
         if isLF(input[i]) { return true }
         if isCR(input[i]) {
-            var j = i; input.formIndex(after: &j)
+            var j = i
+            input.formIndex(after: &j)
             return j != input.endIndex && isLF(input[j])
         }
         return false
@@ -124,7 +125,7 @@ public enum NetrcError: Error, CustomStringConvertible, Equatable {
 
 public struct Netrc: Sendable {
     public struct Machine: Sendable {
-        public var name: String?      // nil for `default`
+        public var name: String?  // nil for `default`
         public var login: String?
         public var password: String?
         public var account: String?
@@ -140,9 +141,10 @@ public struct Netrc: Sendable {
     public func authorization(for url: URL) -> Authorization? {
         let host = url.host
         let port = url.port
-        let exact = machines.first { $0.name == host && ($0.port == nil || $0.port == port) }
-               ?? machines.first { $0.name == host }
-               ?? machines.first { $0.name == nil }
+        let exact =
+            machines.first { $0.name == host && ($0.port == nil || $0.port == port) }
+            ?? machines.first { $0.name == host }
+            ?? machines.first { $0.name == nil }
         guard let login = exact?.login, let pw = exact?.password else { return nil }
         return Authorization(login: login, password: pw)
     }
@@ -216,21 +218,25 @@ public struct NetrcParser {
                     haveCurrent = true
 
                 case "login":
-                    current.login = dec(try nextWord("login")); haveCurrent = true
+                    current.login = dec(try nextWord("login"))
+                    haveCurrent = true
 
                 case "password":
-                    current.password = dec(try nextWord("password")); haveCurrent = true
+                    current.password = dec(try nextWord("password"))
+                    haveCurrent = true
 
                 case "account":
-                    current.account = dec(try nextWord("account")); haveCurrent = true
+                    current.account = dec(try nextWord("account"))
+                    haveCurrent = true
 
                 case "port":
                     let pstr = dec(try nextWord("port"))
                     guard let p = Int(pstr) else { throw NetrcError.expectedValue(after: "port") }
-                    current.port = p; haveCurrent = true
+                    current.port = p
+                    haveCurrent = true
 
                 case "macdef":
-                    _ = lx.next() // macro name (optional)
+                    _ = lx.next()  // macro name (optional)
                     // consume until blank line
                     var sawNewline = false
                     while true {
@@ -249,7 +255,7 @@ public struct NetrcParser {
 
                 default:
                     // unknown key: best-effort swallow one value
-                    if case .word = lx.next() { /* ignore value */ }
+                    if case .word = lx.next() { /* ignore value */  }
                 }
             }
         }

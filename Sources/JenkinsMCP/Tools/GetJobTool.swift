@@ -10,9 +10,9 @@ struct GetJobTool: JenkinsTool {
                 "path": .object([
                     "type": "string",
                     "description": """
-                        The job path (e.g. 'folder/subfolder/job'). Use forward slashes to separate nested folders. \
-                        For jobs at the root level, use just the job name.
-                        """,
+                    The job path (e.g. 'folder/subfolder/job'). Use forward slashes to separate nested folders. \
+                    For jobs at the root level, use just the job name.
+                    """,
                 ])
             ],
             "required": ["path"],

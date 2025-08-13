@@ -10,9 +10,9 @@ struct CancelQueueItemTool: JenkinsTool {
                 "id": .object([
                     "type": "integer",
                     "description": """
-                        The queue item ID to cancel. You can find queue item IDs using the get_queue tool, \
-                        which lists all currently queued builds with their IDs.
-                        """,
+                    The queue item ID to cancel. You can find queue item IDs using the get_queue tool, \
+                    which lists all currently queued builds with their IDs.
+                    """,
                 ])
             ],
             "required": ["id"],

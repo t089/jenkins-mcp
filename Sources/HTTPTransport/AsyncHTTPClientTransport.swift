@@ -1,13 +1,13 @@
-
 import AsyncHTTPClient
 import HTTPTypes
-#if canImport(FoundationEssentials)
-import FoundationEssentials
-#else
-import Foundation
-#endif
-import NIOCore
 import Logging
+import NIOCore
+
+#if canImport(FoundationEssentials)
+    import FoundationEssentials
+#else
+    import Foundation
+#endif
 
 public var noopLogger: Logger {
     return Logger(label: "noop", factory: SwiftLogNoOpLogHandler.init)
@@ -30,7 +30,6 @@ public struct HTTPClientTransport: HTTPTransport {
     public func send(_ request: HTTPRequest, body: HTTPBody?, baseUrl: URL) async throws -> (HTTPResponse, HTTPBody?) {
         let request = try HTTPClientRequest(from: request, body: body, baseUrl: baseUrl)
         let response = try await client.execute(request, timeout: defaultTimeout)
-        
 
         let body = response.body.map { ArraySlice($0.readableBytesView) }
         let length: HTTPBody.Length
@@ -51,7 +50,8 @@ public struct InvalidUrlError: Error {
 extension HTTPClientRequest {
     init(from request: HTTPRequest, body: HTTPBody?, baseUrl: URL) throws {
         guard var baseUrlComponents = URLComponents(string: baseUrl.absoluteString),
-        let requestUrlComponents = URLComponents(string: request.path ?? "") else {
+            let requestUrlComponents = URLComponents(string: request.path ?? "")
+        else {
             throw InvalidUrlError(request: request, baseUrl: baseUrl)
         }
 
@@ -76,11 +76,14 @@ extension HTTPClientRequest {
             case .known(let size):
                 length = .known(Int64(size))
             }
-            self.body = .stream(body.map { 
-                var buffer = ByteBuffer()
-                buffer.writeBytes($0)
-                return buffer
-            }, length: length)
+            self.body = .stream(
+                body.map {
+                    var buffer = ByteBuffer()
+                    buffer.writeBytes($0)
+                    return buffer
+                },
+                length: length
+            )
         }
     }
 }

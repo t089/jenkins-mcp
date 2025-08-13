@@ -32,7 +32,7 @@ public struct JenkinsClient: Sendable {
             self.client = client
             self.path = path
         }
-        
+
         /// Navigate to a nested job by appending a name/path to the current path
         public func job(named name: String) -> JobClient {
             let nestedPath = path.isEmpty ? name : "\(path)/\(name)"
@@ -81,7 +81,11 @@ public struct JenkinsClient: Sendable {
                     } else {
                         formBody = nil
                     }
-                    let (response, _) = try await self.client.transport.send(request, body: formBody, baseUrl: self.client.baseURL)
+                    let (response, _) = try await self.client.transport.send(
+                        request,
+                        body: formBody,
+                        baseUrl: self.client.baseURL
+                    )
 
                     guard response.status == .created else {
                         throw JenkinsAPIError.httpError(response.status.code)
@@ -135,7 +139,11 @@ public struct JenkinsClient: Sendable {
             public func stop(number buildNumber: Int) async throws {
                 let jobPath = jobPath.split(separator: "/").map { "job/\($0)" }.joined(separator: "/")
                 let request = try self.client.buildRequest(path: "/\(jobPath)/\(buildNumber)/stop", method: .post)
-                let (response, _) = try await self.client.transport.send(request, body: nil, baseUrl: self.client.baseURL)
+                let (response, _) = try await self.client.transport.send(
+                    request,
+                    body: nil,
+                    baseUrl: self.client.baseURL
+                )
 
                 guard response.status == .found || response.status == .ok else {
                     throw JenkinsAPIError.httpError(response.status.code)
@@ -156,13 +164,13 @@ public struct JenkinsClient: Sendable {
             ) async throws -> R {
                 let jobPath = self.jobPath.split(separator: "/").map { "job/\($0)" }.joined(separator: "/")
                 let logPath = "/\(jobPath)/\(buildNumber)/logText/progressiveText?start=\(startOffset)"
-                
+
                 let request = try self.client.buildRequest(path: logPath)
                 let (body, hasMoreData, textSize) = try await self.client.performProgressiveRequest(request)
-                
+
                 let nextOffset = hasMoreData ? textSize : nil
                 let lines = AsyncLineSequence(body: body)
-                
+
                 return try await execute(nextOffset, lines)
             }
 
@@ -182,6 +190,22 @@ public struct JenkinsClient: Sendable {
                     )
                 }
             }
+
+            /// Fetch the test report for a specific build number
+            /// - Parameter buildNumber: The build number to fetch the test report for
+            /// - Returns: The test report for the specified build number, or nil if the report is not found.
+            public func testReport(number buildNumber: Int) async throws -> TestReport? {
+                let jobPath = self.jobPath.split(separator: "/").map { "job/\($0)" }.joined(separator: "/")
+                let request = try self.client.buildRequest(path: "/\(jobPath)/\(buildNumber)/testReport/api/json")
+
+                do {
+                    let (_, report): (HTTPResponse, TestReport) = try await self.client.performJSONRequest(request)
+                    return report
+                } catch JenkinsAPIError.httpError(404) {
+                    // No test report available for this build
+                    return nil
+                }
+            }
         }
 
         public var builds: BuildClient {
@@ -192,18 +216,18 @@ public struct JenkinsClient: Sendable {
     public func job(at path: String = "") -> JobClient {
         return JobClient(client: self, path: path)
     }
-    
+
     public func job(byURL url: String) throws -> JobClient {
         // Parse the URL to extract the job path
         let jobPath = try extractJobPath(from: url)
         return JobClient(client: self, path: jobPath)
     }
-    
+
     private func extractJobPath(from urlString: String) throws -> String {
         let (jobPath, _) = try parseJenkinsURL(urlString)
         return jobPath
     }
-    
+
     private func parseJenkinsURL(_ urlString: String) throws -> (jobPath: String, buildNumber: Int?) {
         // Handle both absolute URLs and relative paths
         let path: String
@@ -215,16 +239,16 @@ public struct JenkinsClient: Sendable {
         } else {
             path = urlString
         }
-        
+
         // Remove trailing slash if present
         let normalizedPath = path.hasSuffix("/") ? String(path.dropLast()) : path
-        
+
         // Parse Jenkins job path format: /job/folder/job/subfolder/job/jobname/123
         let components = normalizedPath.split(separator: "/")
         var jobPathComponents: [String] = []
         var buildNumber: Int? = nil
         var i = 0
-        
+
         while i < components.count {
             if components[i] == "job" && i + 1 < components.count {
                 jobPathComponents.append(String(components[i + 1]))
@@ -239,14 +263,13 @@ public struct JenkinsClient: Sendable {
                 i += 1
             }
         }
-        
+
         guard !jobPathComponents.isEmpty else {
             throw JenkinsAPIError.invalidPath("No job path found in URL: \(urlString)")
         }
-        
+
         return (jobPathComponents.joined(separator: "/"), buildNumber)
     }
-
 
     public struct QueueClient {
         private let client: JenkinsClient
@@ -290,18 +313,18 @@ public struct JenkinsClient: Sendable {
     public var queue: QueueClient {
         return QueueClient(client: self)
     }
-    
+
     public func get() async throws -> JenkinsOverview {
         let request = try buildRequest(path: "/api/json")
         let (response, overview): (HTTPResponse, JenkinsOverview) = try await performJSONRequest(request)
-        
+
         // Extract version from X-Jenkins header
         let version = response.headerFields[.init("X-Jenkins")!]
-        
+
         // Create a new JenkinsOverview with the version field populated
         return JenkinsOverview(
-            version: version,
             jobs: overview.jobs,
+            version: version,
             description: overview.description,
             nodeName: overview.nodeName,
             nodeDescription: overview.nodeDescription,
@@ -449,12 +472,9 @@ extension JenkinsClient {
     }
 }
 
-
-
 public struct QueueItemRef: Codable, Sendable {
     public var url: String
     public var queueItemId: Int?
-
 
     public init(url: String) {
         self.url = url
@@ -468,7 +488,7 @@ public struct GrepMatch: Codable, Sendable {
     public let elementNumber: Int
     public let content: String
     public let isMatch: Bool
-    
+
     public init(elementNumber: Int, content: String, isMatch: Bool) {
         self.elementNumber = elementNumber
         self.content = content

@@ -1,5 +1,5 @@
-import MCP
 import JenkinsSDK
+import MCP
 
 protocol ToolProtocol: Sendable {
     associatedtype Output: Encodable, Sendable
@@ -11,6 +11,6 @@ protocol ToolProtocol: Sendable {
     func execute(arguments: [String: Value]) async throws -> Output
 }
 
-protocol JenkinsTool : ToolProtocol {
+protocol JenkinsTool: ToolProtocol {
     var jenkinsClient: JenkinsClient { get }
 }

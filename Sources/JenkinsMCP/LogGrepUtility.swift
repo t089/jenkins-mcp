@@ -13,7 +13,7 @@ struct LogGrepUtility {
         let context: Int
         let offset: Int
         let maxLines: Int
-        
+
         init(pattern: String, context: Int = 0, offset: Int = 0, maxLines: Int = 200) {
             self.pattern = pattern
             self.context = context
@@ -21,7 +21,7 @@ struct LogGrepUtility {
             self.maxLines = maxLines
         }
     }
-    
+
     static func grepLines<S: AsyncSequence>(
         from lines: S,
         options: GrepOptions
@@ -32,20 +32,20 @@ struct LogGrepUtility {
         } catch {
             throw ValidationError("Invalid regex pattern: \(options.pattern)")
         }
-        
+
         var contextBefore: Deque<GrepLine> = Deque(minimumCapacity: options.context)
         var index = 0
         var matches = [GrepLine]()
         var iterator = lines.makeAsyncIterator()
         var contextAfterRemaining = 0
-        
+
         while true {
             defer { index += 1 }
-            
+
             guard let line = try await iterator.next() else {
                 break
             }
-            
+
             if index < options.offset {
                 contextBefore.append(GrepLine(lineNumber: index + 1, match: nil, context: line))
                 if contextBefore.count > options.context {
@@ -53,7 +53,7 @@ struct LogGrepUtility {
                 }
                 continue
             }
-            
+
             if matches.count < options.maxLines, try regex.firstMatch(in: line) != nil {
                 matches.append(contentsOf: contextBefore)
                 contextBefore.removeAll(keepingCapacity: true)
@@ -72,7 +72,7 @@ struct LogGrepUtility {
                 break
             }
         }
-        
+
         return matches
     }
 }

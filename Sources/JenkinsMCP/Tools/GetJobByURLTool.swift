@@ -9,11 +9,11 @@ struct GetJobByURLTool: JenkinsTool {
             "properties": [
                 "url": .object([
                     "type": "string",
-                    "format": "uri", 
+                    "format": "uri",
                     "description": """
-                        The Jenkins job URL (e.g., 'https://jenkins.example.com/job/my-project/' or \
-                        'https://jenkins.example.com/job/folder/job/subfolder/job/my-project/')
-                        """,
+                    The Jenkins job URL (e.g., 'https://jenkins.example.com/job/my-project/' or \
+                    'https://jenkins.example.com/job/folder/job/subfolder/job/my-project/')
+                    """,
                 ])
             ],
             "required": ["url"],

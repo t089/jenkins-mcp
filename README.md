@@ -15,7 +15,7 @@ A Model Context Protocol (MCP) server for Jenkins automation, enabling AI assist
 
 This project provides a stdio MCP server that exposes Jenkins functionality to AI assistants through the Model Context Protocol, enabling seamless automation and interaction with Jenkins instances.
 
-The server includes efficient tools for working with large log outputs, using grep patterns and pagination to explore logs progressively without overwhelming context windows.
+The server includes efficient tools for working with large outputs, using grep patterns and pagination to explore logs progressively without overwhelming context windows. It also provides flexible test result analysis with filtering options to manage output size for large test suites.
 
 ## Installation
 
@@ -60,7 +60,7 @@ swift build -c release
         "-i",
         "-v",
         "/path/to/.netrc:/var/jenkins/.netrc",
-        "ghcr.io/t089/jenkins-mcp:0.0.1-beta",
+        "ghcr.io/t089/jenkins-mcp:0.0.4-beta",
         "--jenkins-url",
         "https://your-jenkins.com",
         "--netrc-file",
@@ -90,6 +90,13 @@ swift build -c release
 - `get_build_logs` - Get console output with pagination
 - `get_build_logs_offset` - Read logs from specific offset
 - `grep_build_logs` - Search logs with regex patterns
+
+**Test Results:**
+- `get_build_test_report` - Get test results with filtering options:
+  - `level`: Control output detail (`summary`, `suite`, `full`)  
+  - `status`: Filter by test status (`all`, `failed`, `passed`, `skipped`)
+  - `namePattern`: Filter tests by regex pattern
+  - `maxTests`: Limit number of test cases returned (when using `full` level)
 
 ## Running the Server
 

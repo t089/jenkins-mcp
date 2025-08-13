@@ -2,9 +2,9 @@ import MCP
 import Synchronization
 
 #if canImport(FoundationEssentials)
-import FoundationEssentials
+    import FoundationEssentials
 #else
-import Foundation
+    import Foundation
 #endif
 
 final class ToolRegistry: Sendable {
@@ -17,14 +17,14 @@ final class ToolRegistry: Sendable {
     func register(_ tools: [any ToolProtocol]) {
         self.tools.withLock { state in tools.forEach { state[$0.name] = $0 } }
     }
-    
+
     func register(_ tools: any ToolProtocol...) {
         self.register(tools)
     }
 
     let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys ]
+        encoder.outputFormatting = [.sortedKeys]
         encoder.dateEncodingStrategy = .iso8601
         encoder.keyEncodingStrategy = .convertToSnakeCase
         return encoder

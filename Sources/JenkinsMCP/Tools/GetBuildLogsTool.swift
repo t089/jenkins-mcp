@@ -115,9 +115,9 @@ struct GrepBuildLogsTool: JenkinsTool {
                 "pattern": .object([
                     "type": "string",
                     "description": """
-                        The pattern to search for in the logs. Supports regular expressions
-                        (e.g., 'ERROR', 'Test.*failed', 'BUILD SUCCESSFUL').
-                        """,
+                    The pattern to search for in the logs. Supports regular expressions
+                    (e.g., 'ERROR', 'Test.*failed', 'BUILD SUCCESSFUL').
+                    """,
                 ]),
             ],
             "required": ["path", "buildNumber", "pattern"],

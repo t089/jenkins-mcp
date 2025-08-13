@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JenkinsSDK
 
 @Test func example() async throws {

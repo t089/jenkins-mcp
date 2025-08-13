@@ -11,9 +11,9 @@ struct GetBuildByURLTool: JenkinsTool {
                     "type": "string",
                     "format": "uri",
                     "description": """
-                        The Jenkins build URL (e.g., 'https://jenkins.example.com/job/project/123/' or \
-                        'https://jenkins.example.com/job/folder/job/subfolder/job/project/456/')
-                        """,
+                    The Jenkins build URL (e.g., 'https://jenkins.example.com/job/project/123/' or \
+                    'https://jenkins.example.com/job/folder/job/subfolder/job/project/456/')
+                    """,
                 ])
             ],
             "required": ["url"],

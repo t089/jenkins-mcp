@@ -11,7 +11,7 @@ struct GetQueueItemTool: JenkinsTool {
                     "type": .string("integer")
                 ])
             ],
-            "required": [ "queueItemId" ],
+            "required": ["queueItemId"],
         ])
     }
 
@@ -22,7 +22,6 @@ struct GetQueueItemTool: JenkinsTool {
         the reason for being queued, and the time spent in the queue. This is useful for monitoring and managing
         Jenkins jobs, especially in environments with high build activity.
         """
-
 
     func execute(arguments: [String: Value]) async throws -> QueueItem {
         guard let queueItemId = arguments["queueItemId"]?.intValue else {

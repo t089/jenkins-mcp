@@ -15,15 +15,14 @@ import SystemPackage
 #endif
 
 #if canImport(Darwin)
-import Darwin
+    import Darwin
 #elseif canImport(Glibc)
-import Glibc
+    import Glibc
 #elseif canImport(Musl)
-import Musl
+    import Musl
 #else
-#error("Unsupported platform")
+    #error("Unsupported platform")
 #endif
-
 
 @main
 struct JenkinsMCP: AsyncParsableCommand {
@@ -46,22 +45,25 @@ struct JenkinsMCP: AsyncParsableCommand {
         {
             return JenkinsCredentials(username: username, password: password)
         } else {
-            let netrcFile = netrcFile
+            let netrcFile =
+                netrcFile
                 ?? FileManager
-                    .default
-                    .homeDirectoryForCurrentUser
-                    .appendingPathComponent(".netrc")
-                    .path
-            
+                .default
+                .homeDirectoryForCurrentUser
+                .appendingPathComponent(".netrc")
+                .path
+
             if !FileManager.default.fileExists(atPath: netrcFile) {
                 throw ValidationError("Netrc file does not exist at \(netrcFile)")
             }
 
             var st = stat()
             if stat(netrcFile, &st) != 0 {
-                throw ValidationError("Failed to get attributes of netrc file at \(netrcFile): \(String(cString: strerror(errno)))")
+                throw ValidationError(
+                    "Failed to get attributes of netrc file at \(netrcFile): \(String(cString: strerror(errno)))"
+                )
             }
-            
+
             let filePermissions = FilePermissions(rawValue: st.st_mode)
             guard filePermissions.isDisjoint(with: [.groupRead, .otherRead]) else {
                 throw ValidationError("Netrc file at \(netrcFile) must be user readable only")
@@ -90,15 +92,13 @@ struct JenkinsMCP: AsyncParsableCommand {
         // Create a server with given capabilities
         let server = Server(
             name: "JenkinsMCP",
-            version: "0.0.1",
+            version: "0.0.4-beta",
             capabilities: .init(
                 prompts: nil,
                 resources: nil,
                 tools: .init(listChanged: false)
             )
         )
-
-        
 
         var config = HTTPClient.Configuration.singletonConfiguration
         config.decompression = .enabled(limit: .none)
@@ -126,6 +126,7 @@ struct JenkinsMCP: AsyncParsableCommand {
             GetBuildLogsTool(jenkinsClient: jenkinsClient),
             GetBuildLogsOffsetTool(jenkinsClient: jenkinsClient),
             GrepBuildLogsTool(jenkinsClient: jenkinsClient),
+            BuildTestReportTool(jenkinsClient: jenkinsClient),
             TriggerBuildTool(jenkinsClient: jenkinsClient),
             StopBuildTool(jenkinsClient: jenkinsClient),
             GetQueueTool(jenkinsClient: jenkinsClient),

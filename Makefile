@@ -1,6 +1,6 @@
 HOST=ghcr.io
 REPOSITORY=$(HOST)/t089/jenkins-mcp
-TAG=0.0.4-beta
+TAG=0.1.0
 
 
 docker: docker-manifest

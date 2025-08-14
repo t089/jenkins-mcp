@@ -92,7 +92,7 @@ struct JenkinsMCP: AsyncParsableCommand {
         // Create a server with given capabilities
         let server = Server(
             name: "JenkinsMCP",
-            version: "0.0.4-beta",
+            version: "0.1.0",
             capabilities: .init(
                 prompts: nil,
                 resources: nil,

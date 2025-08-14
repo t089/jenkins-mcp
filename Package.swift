@@ -31,8 +31,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.26.0"),
         .package(url: "https://github.com/apple/swift-http-types.git", from: "1.0.0"),
-        //.package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.9.0"),
-        .package(name: "swift-sdk", path: "../swift-mcp-sdk"),
+        .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.10.1"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.6.1"),
         .package(url: "https://github.com/apple/swift-container-plugin.git", from: "1.0.2"),
         .package(url: "https://github.com/swift-server/swift-service-lifecycle.git", from: "2.8.0"),

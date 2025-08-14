@@ -97,6 +97,9 @@ swift build -c release
   - `status`: Filter by test status (`all`, `failed`, `passed`, `skipped`)
   - `namePattern`: Filter tests by regex pattern
   - `maxTests`: Limit number of test cases returned (when using `full` level)
+  - `maxErrorLength`: Maximum length for error details and stack traces (default: 1000, 0 = no truncation)
+  - `limit`: Maximum number of test suites to return (default: 50)
+  - `offset`: Number of test suites to skip for pagination (default: 0)
 
 ## Running the Server
 

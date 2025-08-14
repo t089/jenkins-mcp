@@ -130,6 +130,7 @@ struct JenkinsMCP: AsyncParsableCommand {
             TriggerBuildTool(jenkinsClient: jenkinsClient),
             StopBuildTool(jenkinsClient: jenkinsClient),
             GetQueueTool(jenkinsClient: jenkinsClient),
+            GetQueueItemTool(jenkinsClient: jenkinsClient),
             CancelQueueItemTool(jenkinsClient: jenkinsClient)
         )
 

@@ -24,8 +24,17 @@ import SystemPackage
     #error("Unsupported platform")
 #endif
 
+let VERSION = "0.2.0"
+
 @main
 struct JenkinsMCP: AsyncParsableCommand {
+
+    static var configuration: CommandConfiguration { CommandConfiguration(
+            commandName: "jenkins-mcp",
+            abstract: "A MCP server that exposes Jenkins functionalities via tools.",
+            version: VERSION
+        )
+    }
 
     @Option(name: .shortAndLong, help: "The Jenkins base URL (e.g. http://localhost:8080)")
     var jenkinsUrl: String
@@ -92,7 +101,7 @@ struct JenkinsMCP: AsyncParsableCommand {
         // Create a server with given capabilities
         let server = Server(
             name: "JenkinsMCP",
-            version: "0.1.0",
+            version: VERSION,
             capabilities: .init(
                 prompts: nil,
                 resources: nil,

@@ -9,10 +9,7 @@ struct CancelQueueItemTool: JenkinsTool {
             "properties": [
                 "id": .object([
                     "type": "integer",
-                    "description": """
-                    The queue item ID to cancel. You can find queue item IDs using the get_queue tool, \
-                    which lists all currently queued builds with their IDs.
-                    """,
+                    "description": "Queue item ID to cancel (from get_queue)",
                 ])
             ],
             "required": ["id"],
@@ -21,11 +18,7 @@ struct CancelQueueItemTool: JenkinsTool {
 
     let jenkinsClient: JenkinsClient
     let name = "cancel_queue_item"
-    let description = """
-        Cancel a queued build item that is waiting to start execution. Use this tool when you need to \
-        remove a build from the Jenkins queue before it begins running. Queue items are builds that have \
-        been scheduled but haven't started yet due to resource constraints or dependencies.
-        """
+    let description = "Cancel queued build before execution. Removes pending builds from queue."
 
     struct CancelQueueItemResult: Codable, Sendable {
         let success: Bool

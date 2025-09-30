@@ -10,10 +10,7 @@ struct GetBuildByURLTool: JenkinsTool {
                 "url": .object([
                     "type": "string",
                     "format": "uri",
-                    "description": """
-                    The Jenkins build URL (e.g., 'https://jenkins.example.com/job/project/123/' or \
-                    'https://jenkins.example.com/job/folder/job/subfolder/job/project/456/')
-                    """,
+                    "description": "Jenkins build URL",
                 ])
             ],
             "required": ["url"],
@@ -22,12 +19,7 @@ struct GetBuildByURLTool: JenkinsTool {
 
     let jenkinsClient: JenkinsClient
     let name = "get_build_by_url"
-    let description = """
-        Get build details by URL. Retrieves comprehensive information about a specific Jenkins build including \
-        status, duration, parameters, and metadata. Use this when you have a direct build URL from Jenkins. \
-        Returns build number, status (SUCCESS, FAILURE, etc.), start time, duration, parameters, and other \
-        build metadata.
-        """
+    let description = "Get build details by URL. Returns status, duration, parameters, and metadata."
 
     func execute(arguments: [String: Value]) async throws -> Build {
         guard let url = arguments["url"]?.stringValue else {

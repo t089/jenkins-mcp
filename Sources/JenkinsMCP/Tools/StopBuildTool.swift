@@ -9,11 +9,11 @@ struct StopBuildTool: JenkinsTool {
             "properties": [
                 "path": .object([
                     "type": "string",
-                    "description": "The job path (e.g. 'folder/subfolder/job')",
+                    "description": "Job path (e.g. 'folder/subfolder/job')",
                 ]),
                 "buildNumber": .object([
                     "type": "integer",
-                    "description": "The build number to stop",
+                    "description": "Build number to stop",
                 ]),
             ],
             "required": ["path", "buildNumber"],
@@ -22,12 +22,7 @@ struct StopBuildTool: JenkinsTool {
 
     let jenkinsClient: JenkinsClient
     let name = "stop_build"
-    let description = """
-        Stop a running build for a Jenkins job. This action immediately terminates the build execution and marks it as \
-        aborted. Use this when you need to cancel a build that is taking too long, consuming too many resources, or was \
-        started with incorrect parameters. Note that only actively running builds can be stopped - completed, failed, or \
-        already aborted builds cannot be stopped.
-        """
+    let description = "Stop running build. Terminates execution and marks as aborted. Only applies to active builds."
 
     struct StopBuildResult: Codable, Sendable {
         let success: Bool

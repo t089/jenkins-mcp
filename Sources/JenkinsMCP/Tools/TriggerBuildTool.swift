@@ -9,13 +9,12 @@ struct TriggerBuildTool: JenkinsTool {
             "properties": [
                 "path": .object([
                     "type": "string",
-                    "description":
-                        "The job path (e.g. 'folder/subfolder/job'). Use forward slashes to separate nested folders and jobs.",
+                    "description": "Job path (e.g. 'folder/subfolder/job')",
                 ]),
                 "parameters": .object([
                     "type": "object",
                     "description":
-                        "Build parameters as key-value pairs. Only string values are supported, use \"true\"/\"false\" for booleans, and \"x\" for numbers (where x is the number). If the job has no parameters, this can be omitted.",
+                        "Build parameters as key-value pairs (strings only: \"true\"/\"false\" for bools, \"123\" for numbers)",
                     "additionalProperties": .object([
                         "type": "string"
                     ]),
@@ -23,11 +22,8 @@ struct TriggerBuildTool: JenkinsTool {
                 "waitForBuildToStart": .object([
                     "type": "boolean",
                     "default": false,
-                    "description": """
-                    If true, the tool will wait for the build to start and return the queue item \
-                    reference. If false, it will return immediately with the queue item reference. \
-                    The tool will wait for up to 30 seconds for the build to start before returning.
-                    """,
+                    "description":
+                        "Wait for build to start (max 30s). If false, returns immediately",
                 ]),
             ],
             "required": ["path"],
@@ -36,11 +32,8 @@ struct TriggerBuildTool: JenkinsTool {
 
     let jenkinsClient: JenkinsClient
     let name = "trigger_build"
-    let description = """
-        Trigger a build for a job with optional parameters. Returns a queue item reference that can be used to track \
-        the build status using the get_queue_item tool. The build will be queued and executed according to Jenkins scheduling and resource \
-        availability.
-        """
+    let description =
+        "Trigger job build with optional parameters. Returns queue item reference for tracking."
 
     func execute(arguments: [String: Value]) async throws -> QueueItem {
         guard let path = arguments["path"]?.stringValue else {

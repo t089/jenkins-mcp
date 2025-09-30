@@ -15,47 +15,47 @@ struct BuildTestReportTool: JenkinsTool {
             "properties": [
                 "path": .object([
                     "type": "string",
-                    "description": "The job path (e.g. 'folder/subfolder/job')",
+                    "description": "Job path (e.g. 'folder/subfolder/job')",
                 ]),
                 "buildNumber": .object([
                     "type": "integer",
-                    "description": "The build number",
+                    "description": "Build number",
                 ]),
                 "level": .object([
                     "type": "string",
                     "enum": ["summary", "suite", "full"],
                     "description":
-                        "Output detail level: 'summary' for overall counts, 'suite' for test suites without individual tests, 'full' for complete details (default: 'suite')",
+                        "Detail level: 'summary' (counts), 'suite' (no tests), 'full' (all). Default: 'suite'",
                 ]),
                 "status": .object([
                     "type": "string",
                     "enum": ["all", "failed", "passed", "skipped"],
-                    "description": "Filter tests by status (default: 'all')",
+                    "description": "Filter by status. Default: 'all'",
                 ]),
                 "namePattern": .object([
                     "type": "string",
                     "description":
-                        "Optional regex pattern to filter test names (applies to suite names or test class/method names)",
+                        "Regex to filter test names (suite/class/method)",
                 ]),
                 "maxTests": .object([
                     "type": "integer",
                     "description":
-                        "Maximum number of test cases to return (default: 100, only applies when level is 'full')",
+                        "Max test cases (default: 100, level='full' only)",
                 ]),
                 "maxErrorLength": .object([
                     "type": "integer",
                     "description":
-                        "Maximum length for error details and stack traces (default: 1000, 0 = no truncation)",
+                        "Max length for error details/traces (default: 1000, 0=no limit)",
                 ]),
                 "limit": .object([
                     "type": "integer",
                     "description":
-                        "Maximum number of test suites to return (default: 50)",
+                        "Max test suites. Default: 50",
                 ]),
                 "offset": .object([
                     "type": "integer",
                     "description":
-                        "Number of test suites to skip for pagination (default: 0)",
+                        "Test suites to skip for pagination. Default: 0",
                 ]),
             ],
             "required": ["path", "buildNumber"],
@@ -65,9 +65,7 @@ struct BuildTestReportTool: JenkinsTool {
     let jenkinsClient: JenkinsClient
     let name = "get_build_test_report"
     let description = """
-        Get test report for a build with filtering options to control output size. Returns test results including
-        pass/fail counts, test suites, and individual test cases. Use filtering options to reduce context size
-        for large test suites. Returns null if no test report is available for the build.
+        Get build test report with filtering. Returns pass/fail counts, suites, and cases. Null if unavailable.
         """
 
     func execute(arguments: [String: Value]) async throws -> TestReportResponse? {

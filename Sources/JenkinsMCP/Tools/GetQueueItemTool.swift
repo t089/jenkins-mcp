@@ -17,11 +17,7 @@ struct GetQueueItemTool: JenkinsTool {
 
     let jenkinsClient: JenkinsClient
     let name = "get_queue_item"
-    let description = """
-        Get information about a specific item in the Jenkins build queue. This includes details such as the job name,
-        the reason for being queued, and the time spent in the queue. This is useful for monitoring and managing
-        Jenkins jobs, especially in environments with high build activity.
-        """
+    let description = "Get build queue item details. Returns job name, queue reason, and wait time."
 
     func execute(arguments: [String: Value]) async throws -> QueueItem {
         guard let queueItemId = arguments["queueItemId"]?.intValue else {

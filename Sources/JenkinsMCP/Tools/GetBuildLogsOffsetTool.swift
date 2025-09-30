@@ -15,20 +15,19 @@ struct GetBuildLogsOffsetTool: JenkinsTool {
             "properties": [
                 "path": .object([
                     "type": "string",
-                    "description": "The job path (e.g. 'folder/subfolder/job')",
+                    "description": "Job path (e.g. 'folder/subfolder/job')",
                 ]),
                 "buildNumber": .object([
                     "type": "integer",
-                    "description": "The build number",
+                    "description": "Build number",
                 ]),
                 "offset": .object([
                     "type": "integer",
-                    "description":
-                        "Line offset to start from (0-based). Use 0 for first line, 100 to skip first 100 lines, etc.",
+                    "description": "Line offset (0-based). 0=first line, 100=skip first 100",
                 ]),
                 "maxLines": .object([
                     "type": "integer",
-                    "description": "Maximum number of lines to return (default: 200)",
+                    "description": "Max lines to return (default: 200)",
                 ]),
             ],
             "required": ["path", "buildNumber", "offset"],
@@ -37,12 +36,8 @@ struct GetBuildLogsOffsetTool: JenkinsTool {
 
     let jenkinsClient: JenkinsClient
     let name = "get_build_logs_offset"
-    let description = """
-        Get console output of a build from specific offset. Use this when you need to read build logs starting from a \
-        particular line number, which is useful for pagination, continuing from where you left off, or focusing on \
-        specific sections of large log files. The offset is 0-based (first line is offset 0). For general log reading, \
-        use get_build_logs instead.
-        """
+    let description =
+        "Get build logs from specific offset (0-based). For pagination or large log files. Use get_build_logs for general reading."
 
     func execute(arguments: [String: Value]) async throws -> LogResponse {
         guard let path = arguments["path"]?.stringValue,

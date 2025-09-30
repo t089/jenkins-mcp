@@ -9,10 +9,7 @@ struct ListJobsTool: JenkinsTool {
             "properties": [
                 "path": .object([
                     "type": "string",
-                    "description": """
-                    The folder path (e.g. 'folder/subfolder'). Leave empty for root level. \
-                    Use forward slashes to separate nested folders.
-                    """,
+                    "description": "Folder path (e.g. 'folder/subfolder'). Empty for root level",
                 ])
             ],
             "required": [],
@@ -21,11 +18,7 @@ struct ListJobsTool: JenkinsTool {
 
     let jenkinsClient: JenkinsClient
     let name = "list_jobs"
-    let description = """
-        List jobs in a folder or at the root level. Returns all jobs and subfolders within the \
-        specified Jenkins folder path. Use this to explore the Jenkins job hierarchy, find \
-        available jobs, or navigate through folder structures.
-        """
+    let description = "List jobs in folder or root level. Returns jobs and subfolders"
 
     func execute(arguments: [String: Value]) async throws -> [JobSummary] {
         let path = arguments["path"]?.stringValue ?? ""

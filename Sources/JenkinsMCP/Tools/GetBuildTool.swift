@@ -9,11 +9,11 @@ struct GetBuildTool: JenkinsTool {
             "properties": [
                 "path": .object([
                     "type": "string",
-                    "description": "The job path (e.g. 'folder/subfolder/job')",
+                    "description": "Job path (e.g. 'folder/subfolder/job')",
                 ]),
                 "buildNumber": .object([
                     "type": "integer",
-                    "description": "The build number (integer, starting from 1 for the first build)",
+                    "description": "Build number",
                 ]),
             ],
             "required": ["path", "buildNumber"],
@@ -23,9 +23,7 @@ struct GetBuildTool: JenkinsTool {
     let jenkinsClient: JenkinsClient
     let name = "get_build"
     let description =
-        "Get detailed information about a specific build, including its status (SUCCESS, FAILURE, ABORTED, etc.), "
-        + "duration, timestamp, result, and other metadata. Use this tool when you need to inspect the details of a "
-        + "particular build to understand its outcome or gather information for analysis."
+        "Get detailed build information including status, duration, timestamp, and metadata."
 
     func execute(arguments: [String: Value]) async throws -> Build {
         guard let path = arguments["path"]?.stringValue,

@@ -16,20 +16,20 @@ struct GetBuildLogsTool: JenkinsTool {
             "properties": [
                 "path": .object([
                     "type": "string",
-                    "description": "The job path (e.g. 'folder/subfolder/job')",
+                    "description": "Job path (e.g. 'folder/subfolder/job')",
                 ]),
                 "buildNumber": .object([
                     "type": "integer",
-                    "description": "The build number",
+                    "description": "Build number",
                 ]),
                 "maxLines": .object([
                     "type": "integer",
-                    "description": "Maximum number of lines to return (default: 200)",
+                    "description": "Max lines to return (default: 200)",
                 ]),
                 "position": .object([
                     "type": "string",
                     "enum": ["head", "tail"],
-                    "description": "Where to take logs from: 'head' for beginning, 'tail' for end (default: 'tail')",
+                    "description": "Log position: 'head' (beginning) or 'tail' (end, default)",
                 ]),
             ],
             "required": ["path", "buildNumber"],
@@ -39,10 +39,7 @@ struct GetBuildLogsTool: JenkinsTool {
     let jenkinsClient: JenkinsClient
     let name = "get_build_logs"
     let description = """
-        Get console output of a build. Use this tool to retrieve Jenkins build logs for debugging failed builds,
-        monitoring build progress, or extracting build information. You can get logs from the beginning ('head')
-        or end ('tail') of the output, and limit the number of lines returned. Returns structured log data with
-        line offsets and total line counts.
+        Get console output of build. Supports head/tail positioning and line limits. Returns structured data with offsets.
         """
 
     func execute(arguments: [String: Value]) async throws -> LogResponse {
@@ -94,30 +91,27 @@ struct GrepBuildLogsTool: JenkinsTool {
             "properties": [
                 "path": .object([
                     "type": "string",
-                    "description": "The job path (e.g. 'folder/subfolder/job')",
+                    "description": "Job path (e.g. 'folder/subfolder/job')",
                 ]),
                 "buildNumber": .object([
                     "type": "integer",
-                    "description": "The build number",
+                    "description": "Build number",
                 ]),
                 "context": .object([
                     "type": "integer",
-                    "description": "The number of lines of context to include around matches (default: 0)",
+                    "description": "Context lines around matches (default: 0)",
                 ]),
                 "offset": .object([
                     "type": "integer",
-                    "description": "The line offset to start from (default: 0)",
+                    "description": "Line offset to start from (default: 0)",
                 ]),
                 "maxLines": .object([
                     "type": "integer",
-                    "description": "Maximum number of matched lines to return (default: 200)",
+                    "description": "Max matched lines to return (default: 200)",
                 ]),
                 "pattern": .object([
                     "type": "string",
-                    "description": """
-                    The pattern to search for in the logs. Supports regular expressions
-                    (e.g., 'ERROR', 'Test.*failed', 'BUILD SUCCESSFUL').
-                    """,
+                    "description": "Search pattern. Supports regex (e.g., 'ERROR', 'Test.*failed')",
                 ]),
             ],
             "required": ["path", "buildNumber", "pattern"],
@@ -127,10 +121,7 @@ struct GrepBuildLogsTool: JenkinsTool {
     let jenkinsClient: JenkinsClient
     let name = "grep_build_logs"
     let description = """
-        Grep the console output of a build for a given pattern. Use this tool to search through Jenkins build logs
-        for specific error messages, warnings, test results, or other patterns. More efficient than getting full logs
-        when you're looking for specific content. Supports regex patterns and includes configurable context lines
-        around matches. Returns matched lines with line numbers and optional surrounding context.
+        Search build logs for pattern. More efficient than full logs. Supports regex, context lines. Returns matches with line numbers.
         """
 
     func execute(arguments: [String: Value]) async throws -> [GrepLine] {

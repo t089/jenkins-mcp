@@ -1,13 +1,12 @@
 # Jenkins MCP Server
 
-A Model Context Protocol (MCP) server for Jenkins automation, enabling AI assistants to interact with Jenkins instances seamlessly.
+A Model Context Protocol (MCP) server for Jenkins automation, enabling AI assistants to interact with Jenkins instances.
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Installation](#installation)
 - [Available Tools](#available-tools)
-- [Running the Server](#running-the-server)
 - [Authentication](#authentication)
 - [Building and Development](#building-and-development)
 
@@ -101,20 +100,6 @@ swift build -c release
   - `limit`: Maximum number of test suites to return (default: 50)
   - `offset`: Number of test suites to skip for pagination (default: 0)
 
-## Running the Server
-
-```bash
-# Using default ~/.netrc authentication
-swift run jenkins-mcp --jenkins-url https://your-jenkins.com
-
-# Using custom netrc file
-swift run jenkins-mcp --jenkins-url https://your-jenkins.com --netrc-file /path/to/.netrc
-
-# Using environment variables
-export JENKINS_USERNAME=your-username
-export JENKINS_PASSWORD=your-api-token
-swift run jenkins-mcp --jenkins-url https://your-jenkins.com
-```
 
 ## Authentication
 
@@ -139,6 +124,10 @@ chmod 600 ~/.netrc
 export JENKINS_USERNAME=your-username
 export JENKINS_PASSWORD=your-api-token
 ```
+
+**Keychain (macOS - recommended):**
+
+Not yet implemented.
 
 ## Building and Development
 

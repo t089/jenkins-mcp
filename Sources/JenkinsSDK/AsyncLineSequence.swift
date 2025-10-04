@@ -43,6 +43,10 @@ public struct AsyncLineSequence: AsyncSequence, Sendable {
                 return nil
             }
 
+            if let line = readLine(buffer: &buffer) {
+                return line
+            }
+
             while let chunk = try await bodyIterator.next() {
                 buffer.writeBytes(chunk)
 
@@ -50,18 +54,13 @@ public struct AsyncLineSequence: AsyncSequence, Sendable {
                     return line
                 }
             }
-
-            if let line = readLine(buffer: &buffer) {
-                return line
-            } else {
-                guard buffer.readableBytes > 0 else {
-                    return nil
-                }
-
-                defer { buffer.clear() }
-                return String(decoding: buffer.readableBytesView, as: UTF8.self)
+            
+            guard buffer.readableBytes > 0 else {
+                return nil
             }
 
+            defer { buffer.clear() }
+            return String(decoding: buffer.readableBytesView, as: UTF8.self)
         }
     }
 }

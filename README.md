@@ -59,7 +59,7 @@ swift build -c release
         "-i",
         "-v",
         "/path/to/.netrc:/var/jenkins/.netrc",
-        "ghcr.io/t089/jenkins-mcp:0.2.0",
+        "ghcr.io/t089/jenkins-mcp:0.2.1",
         "--jenkins-url",
         "https://your-jenkins.com",
         "--netrc-file",

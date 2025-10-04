@@ -24,7 +24,7 @@ import SystemPackage
     #error("Unsupported platform")
 #endif
 
-let VERSION = "0.2.0"
+let VERSION = "0.2.1"
 
 @main
 struct JenkinsMCP: AsyncParsableCommand {

@@ -10,6 +10,7 @@ let httpClient = HTTPClient(eventLoopGroup: HTTPClient.defaultEventLoopGroup, co
 
 let netrc = try Netrc.parse(String(data: Data(contentsOf: URL(fileURLWithPath: ".netrc")), encoding: .utf8) ?? "")
 let url = URL(string: ProcessInfo.processInfo.environment["JENKINS_URL"] ?? "")!
+let path = ProcessInfo.processInfo.environment["JENKINS_JOB_PATH"] ?? ""
 
 guard let authz = netrc.authorization(for: url) else {
     fatalError("No authorization found for \(url)")
@@ -22,9 +23,9 @@ let jenkins = JenkinsClient(
 )
 
 do {
-    let builds = jenkins.job(at: "Bookiply GitHub/bookiply-backend/PR-7862").builds
+    let builds = jenkins.job(at: path).builds
     let testResult = try await builds.testReport(number: 1)
-    print(testResult)
+    print(testResult as Any)
 } catch {
     print("Error fetching test result: \(error)")
 }

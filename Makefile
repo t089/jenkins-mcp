@@ -35,10 +35,11 @@ docker-manifest: docker-arm64 docker-amd64
 
 docker-latest:
 	@echo "Creating latest multi-arch manifest from $(TAG)..."
-	docker manifest create --amend $(REPOSITORY):latest \
+	docker manifest rm $(REPOSITORY):latest || true
+	docker manifest create $(REPOSITORY):latest \
 		$(REPOSITORY):$(TAG)-amd64 \
 		$(REPOSITORY):$(TAG)-arm64
-	docker manifest push $(REPOSITORY):latest
+	docker manifest push --purge $(REPOSITORY):latest
 	@echo "Latest multi-arch manifest created and pushed successfully."
 
 .PHONY: docker docker-arm64 docker-amd64 docker-manifest docker-latest

@@ -59,7 +59,7 @@ swift build -c release
         "-i",
         "-v",
         "/path/to/.netrc:/var/jenkins/.netrc",
-        "ghcr.io/t089/jenkins-mcp:0.2.1",
+        "ghcr.io/t089/jenkins-mcp:0.3.0",
         "--jenkins-url",
         "https://your-jenkins.com",
         "--netrc-file",
@@ -74,12 +74,11 @@ swift build -c release
 
 **Job Management:**
 - `get_overview` - Jenkins server overview
-- `list_jobs` - List jobs in a folder
-- `get_job` / `get_job_by_url` - Get job details
+- `get_job` - Get job details (including child jobs)
 - `trigger_build` - Trigger builds with parameters
 
 **Build Operations:**
-- `get_build` / `get_build_by_url` - Get build details
+- `get_build` - Get build details
 - `stop_build` - Stop running builds
 - `get_queue` - View build queue
 - `get_queue_item` - Get specific queue item details
@@ -87,7 +86,6 @@ swift build -c release
 
 **Log Analysis:**
 - `get_build_logs` - Get console output with pagination
-- `get_build_logs_offset` - Read logs from specific offset
 - `grep_build_logs` - Search logs with regex patterns
 
 **Test Results:**

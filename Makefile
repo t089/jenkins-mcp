@@ -1,6 +1,6 @@
 HOST=ghcr.io
 REPOSITORY=$(HOST)/t089/jenkins-mcp
-TAG=0.2.1
+TAG=0.3.0
 
 SWIFT_FLAGS=-Xlinker -s
 

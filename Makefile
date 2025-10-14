@@ -4,6 +4,9 @@ TAG=0.2.1
 
 SWIFT_FLAGS=-Xlinker -s
 
+macos:
+	swift build -c release --arch arm64 --arch x86_64
+
 docker: docker-manifest
 	@echo "Docker images built successfully."
 
@@ -42,4 +45,4 @@ docker-latest:
 	docker manifest push --purge $(REPOSITORY):latest
 	@echo "Latest multi-arch manifest created and pushed successfully."
 
-.PHONY: docker docker-arm64 docker-amd64 docker-manifest docker-latest
+.PHONY: macos docker docker-arm64 docker-amd64 docker-manifest docker-latest

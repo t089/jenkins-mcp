@@ -8,3 +8,4 @@ DerivedData/
 .netrc
 .vscode/launch.json
 .vscode/settings.json
+dist

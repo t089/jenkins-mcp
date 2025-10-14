@@ -18,7 +18,7 @@ struct GetJobTool: JenkinsTool {
 
     let jenkinsClient: JenkinsClient
     let name = "get_job"
-    let description = "Get job details by path. Returns configuration, build status, health metrics, and history."
+    let description = "Get job details by path. Returns configuration, build status, health metrics, history, and child jobs (if available)."
 
     func execute(arguments: [String: Value]) async throws -> Job {
         guard let path = arguments["path"]?.stringValue else {

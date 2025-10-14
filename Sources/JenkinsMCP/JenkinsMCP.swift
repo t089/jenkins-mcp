@@ -127,13 +127,9 @@ struct JenkinsMCP: AsyncParsableCommand {
         let toolRegistry = ToolRegistry()
         toolRegistry.register(
             GetOverviewTool(jenkinsClient: jenkinsClient),
-            ListJobsTool(jenkinsClient: jenkinsClient),
             GetJobTool(jenkinsClient: jenkinsClient),
-            GetJobByURLTool(jenkinsClient: jenkinsClient),
             GetBuildTool(jenkinsClient: jenkinsClient),
-            GetBuildByURLTool(jenkinsClient: jenkinsClient),
             GetBuildLogsTool(jenkinsClient: jenkinsClient),
-            GetBuildLogsOffsetTool(jenkinsClient: jenkinsClient),
             GrepBuildLogsTool(jenkinsClient: jenkinsClient),
             BuildTestReportTool(jenkinsClient: jenkinsClient),
             TriggerBuildTool(jenkinsClient: jenkinsClient),
